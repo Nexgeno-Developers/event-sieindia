@@ -1,0 +1,7 @@
+cmd migration error sorting
+https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa
+
+--------------
+
+multi auth system integrated according to this blog
+https://www.fareez.info/blog/authenticate-users-from-multiple-tables-in-laravel/
