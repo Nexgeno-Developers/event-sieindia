@@ -17,6 +17,36 @@ class SlotSeeder extends Seeder
     {
         $insert = [
             [
+                'slot_name' => 'Hall 1 : Polident Hall - 203',
+                'slot_time' => '9:30am to 11:30am',
+                'slot_price_first_step' => '2000',
+                'slot_price' => '6000',
+                'slot_date' => '2024-02-03',
+                'speaker' => 'DR FILIPPO CARDINALI <br> DR GERASIMOS GIANNAKIS',
+                'description' => 'Learning Tips for Successful Obturation - META',
+                'slot_seats' => '5',
+                'workshop' => '1',  //incrementing number
+                'topic_desc' => 'Gain an overview of the rubber dam’s significance in contemporary dentistry, highlighting its applications, benefits, and potential considerations y doing hands-on with anterior quadrant isolation.',
+                'type' => 'Advanced',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'slot_name' => 'Hall 1 : Polident Hall - 203',
+                'slot_time' => '11:45am to 1:45pm',
+                'slot_price_first_step' => '5000',
+                'slot_price' => '8000',
+                'slot_date' => '2024-02-03',
+                'speaker' => 'DR JAYSHREE HEGDE',
+                'description' => 'Embracing Challenging Canal Anatomy: Formula for Success - COLTENE',
+                'slot_seats' => '5',
+                'workshop' => '2', //incrementing number
+                'topic_desc' => 'How, in just one hour, to build up a tooth from zero and mastering the finishing & polishing in only 3 steps.',
+                'type' => 'Premium',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '08am to 10am',
                 'speaker' => 'Amit',
@@ -26,7 +56,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '08am to 10am',
@@ -59,8 +89,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ],  
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '11am to 01pm',
@@ -71,7 +101,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '11am to 01pm',
@@ -104,8 +134,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ],  
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '02pm to 04pm',
@@ -116,7 +146,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '02pm to 04pm',
@@ -149,8 +179,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '05am to 07pm',
@@ -161,7 +191,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '05am to 07pm',
@@ -195,8 +225,8 @@ class SlotSeeder extends Seeder
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
-            
-            
+
+
 
             [
                 'slot_name' => 'Hall A (Suite 202)',
@@ -208,7 +238,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '08am to 10am',
@@ -241,8 +271,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ],  
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '11am to 01pm',
@@ -253,7 +283,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '11am to 01pm',
@@ -286,8 +316,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ],  
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '02pm to 04pm',
@@ -298,7 +328,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '02pm to 04pm',
@@ -331,8 +361,8 @@ class SlotSeeder extends Seeder
                 'slot_price' => '4000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
-            
+            ],
+
             [
                 'slot_name' => 'Hall A (Suite 202)',
                 'slot_time' => '05am to 07pm',
@@ -343,7 +373,7 @@ class SlotSeeder extends Seeder
                 'slot_price' => '1000',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 
+            ],
             [
                 'slot_name' => 'Hall B (Suite 203)',
                 'slot_time' => '05am to 07pm',
@@ -378,7 +408,7 @@ class SlotSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ]
 
-        ];        
+        ];
         DB::table('slots')->insert($insert);
     }
 }
