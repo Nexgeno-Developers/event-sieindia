@@ -23,13 +23,15 @@ $state = null; //isset($booking) ? $booking['state'] : null;
 $slot_default = isset($booking) ? $booking['slot_default'] : null;
 $slot_addition= (isset($booking) && !empty($booking['slot_addition'])) ? $booking['slot_addition'] : array('none');
 $price = $price;
+$premium_price = $premium_price;
+$advanced_price = $advanced_price;
 
 $business_settings = DB::table('business_settings')->where('id', '1')->first();
 
 @endphp
 
 @if(isset(auth()->guard('web')->user()->id) && !empty(auth()->guard('web')->user()->id))
-    @php 
+    @php
         $order = DB::table('orders')->where('phone', auth()->guard('web')->user()->phone)->first();
         $displayForm = ( isset($order->id) && !empty($order->id) ) ? 'no' : 'yes';
     @endphp
@@ -129,16 +131,16 @@ $business_settings = DB::table('business_settings')->where('id', '1')->first();
                                             </select>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-3 col-md-3 col-6 paddright6">
                                         <div class="form-group">
                                             <input type="text" name="zipcode" class="form-control"
                                                 placeholder="Enter Zipcode*" value="{{$zipcode}}" minlength="3" maxlength="50"
                                                 required>
                                         </div>
-                                    </div>                                    
-                                    
-                                    
+                                    </div>
+
+
                                     <div class="col-lg-3 col-md-3 col-6 paddleft6">
                                         <div class="form-group">
                                             <input type="text" name="dci_no" class="form-control"
@@ -154,7 +156,6 @@ $business_settings = DB::table('business_settings')->where('id', '1')->first();
                                         <div class="form-group">
                                             <h4 class="font-size18 mtmb20">Select your 1 Free Hands-on(only one option
                                                 can be selected) <span>*</span>
-
                                                 <span class="price_position"><b>Registration Price:</b> ₹ <span class="df-total">{{$price}}</span>
                                                 </span>
                                             </h4>
@@ -193,6 +194,7 @@ $business_settings = DB::table('business_settings')->where('id', '1')->first();
                                                                             data-target="{{strtotime($date->slot_date)}}_{{md5($slot->slot_time)}}"
                                                                             data-slot="{{$slot->slot_seats}}"
                                                                             data-price="{{$slot->slot_price}}"
+                                                                            data-type="{{$slot->type ?? 'none'}}"
                                                                             id="slot_d{{$slot->id}}"
                                                                             @if($slot->slot_seats <= 0) disabled @endif
                                                                             required>
@@ -429,21 +431,57 @@ $('body').on('change', 'input[name="slot_addition[]"]', function() {
 });
 
 //price calculation
-function price_calculation() {
-     
+function price_calculation(selected_slot_price = 0) {
+    console.log('Selected price', selected_slot_price);
     var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
+    var coupon_type = '{{ Session::get("coupon_type") }}';  // Get coupon type from session
 
-    var slot_default_price = (coupon_code_status == 1) ? 0 : '{{$price}}';
+    var final_price = selected_slot_price;  // Start with the selected slot price
 
+    // If coupon is applied, adjust the price based on the coupon type
+    if (coupon_code_status == 1) {
+        // If Advanced coupon is applied and user selects Premium slot, apply ₹3000 upgrade cost
+        if (coupon_type == 'Advanced' && $('input[name="slot_default"]:checked').data('type') == 'Premium') {
+            final_price += 3000;  // ₹3000 upgrade cost
+        }
+        // If Premium coupon is applied, allow any slot type without additional charge
+        else if (coupon_type == 'Premium') {
+            final_price = 0;  // No extra cost for Premium coupon
+        }
+    }else {
+        final_price = selected_slot_price;  // Set the default price if no coupon
+    }
+
+    console.log('Final price after coupon adjustments:', final_price);
+
+    // Calculate additional prices for added slots
     var slot_addition_price = 0;
     $('.slot_addition_main input:checkbox:checked').each(function() {
         slot_addition_price += parseInt($(this).attr('data-price'));
     });
+    console.log('slot_addition_price:', slot_addition_price);
 
-    $('.df-total').text(parseInt(slot_default_price));
+    // Update the displayed total price (final price is used)
+    $('.df-total').text(parseInt(final_price));
 
-    $('#grand-total').html(parseInt(slot_default_price) + parseInt(slot_addition_price));
+    // Update grand total with final price and additional slot prices
+    $('#grand-total').html(parseInt(final_price) + parseInt(slot_addition_price));
 }
+// function price_calculation() {
+
+//     var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
+
+//     var slot_default_price = (coupon_code_status == 1) ? 0 : '{{$price}}';
+
+//     var slot_addition_price = 0;
+//     $('.slot_addition_main input:checkbox:checked').each(function() {
+//         slot_addition_price += parseInt($(this).attr('data-price'));
+//     });
+
+//     $('.df-total').text(parseInt(slot_default_price));
+
+//     $('#grand-total').html(parseInt(slot_default_price) + parseInt(slot_addition_price));
+// }
 
 //jquery validate form plugin
 
@@ -486,10 +524,26 @@ form.steps({
 
 //validate slot default
 function validate_slot_default(this_event) {
+    console.log('validate');
     var data_target = $(this_event).attr('data-target');
     var is_checked = $(this_event).prop('checked');
+    var selected_slot_type = $(this_event).attr('data-type');  // Get the selected slot type
+    var selected_slot_price = 0;  // Initialize selected slot price
 
+    // Reset all styles and disable logic
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
+
+    // Debugging: Log the selected slot type
+    console.log("Selected slot type: ", selected_slot_type);
+
+    // Set the selected slot price based on its type
+    if (selected_slot_type == 'Premium') {
+        selected_slot_price = {{$premium_price}};
+    } else if (selected_slot_type == 'Advanced') {
+        selected_slot_price = {{$advanced_price}};
+    } else {
+        selected_slot_price = {{$price}};
+    }
 
     $('input:checkbox[name="slot_addition[]"]').each(function() {
         if (parseInt($(this).attr('data-slot')) > 0) {
@@ -514,8 +568,40 @@ function validate_slot_default(this_event) {
     $(this_event).closest('.events_boxex').attr('style',
     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
 
-    price_calculation();
+    // Update total price calculation
+    price_calculation(selected_slot_price);
 }
+// function validate_slot_default(this_event) {
+//     var data_target = $(this_event).attr('data-target');
+//     var is_checked = $(this_event).prop('checked');
+
+//     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
+
+//     $('input:checkbox[name="slot_addition[]"]').each(function() {
+//         if (parseInt($(this).attr('data-slot')) > 0) {
+//             if ($(this).attr('data-target') == data_target) {
+//                 $(this).attr('disabled', 'disabled');
+//                 $(this).prop('checked', false);
+//             } else {
+//                 $(this).removeAttr('disabled');
+//                 $(this).prop('checked', false);
+//             }
+//         }
+//     });
+
+//     $('.slot_addition_main input[data-slot="0"]').attr("disabled", 'disabled');
+
+//     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
+//         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
+
+//     $('.slot_addition_default .events_boxex').attr('style', '');
+//     $('.slot_addition_default input[disabled]').closest('.events_boxex').attr('style',
+//         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
+//     $(this_event).closest('.events_boxex').attr('style',
+//     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
+
+//     price_calculation();
+// }
 
 //validate slot addition
 /*function validate_slot_addition(this_event) {
@@ -534,20 +620,20 @@ function validate_slot_default(this_event) {
 function validate_slot_addition(this_event) { //created new function and deleted old by rashid
     var data_target = $(this_event).attr('data-target');
     var is_checked = $(this_event).prop('checked');
-    
+
     //$('.slot_addition_main .events_boxex').attr('style', '');
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
-    
+
     if(is_checked){
         $(this_event).closest('.events_boxex').attr('style', 'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
     }else{
         $(this_event).closest('.events_boxex').attr('style', 'background: #b8122861;box-shadow: 5px 5px 0px 1px #a6354485;');
     }
 
-    
-    
-    
+
+
+
 
     price_calculation();
 }
@@ -635,7 +721,7 @@ function finalCart() {
     }
 
     var pr = parseInt(deft_price) + parseInt(addit_total_price);
-    
+
     /*var html2 = '';
     console.log(addtt);
     if(addtt != undefined)
@@ -679,7 +765,7 @@ function finalCart() {
                         alert('Invalid coupon!');
                     }
                 }
-            });            
+            });
         }
     }
 </script>
