@@ -4,11 +4,11 @@
 table#all-orders {
     font-size: 14px;
 }
-	
+
 table#all-orders td {
     vertical-align: top;
-}	
-	
+}
+
 </style>
 
 
@@ -28,7 +28,7 @@ table#all-orders td {
 @endif
 
 <div class="card-body">
-	
+
 <div class="table-responsive">
 	<button class="btn btn-success float-end mb-2" onclick="open_add_modal()"><i class="fas fa-plus" aria-hidden="true"></i>  Add Coupon</button>
 	<table id="all-coupons" class="display" style="width:100%">
@@ -42,7 +42,7 @@ table#all-orders td {
             </tr>
         </thead>
         <tbody>
-			
+
 			@php
 			$x = 1;
 			@endphp
@@ -52,7 +52,7 @@ table#all-orders td {
 				<td>
 					{{$data->code}}
 				</td>
-				<td> 
+				<td>
 					@if($data->is_used == 1)
 						<h4><span class="badge bg-success">Yes</span></h4>
 					@else
@@ -71,7 +71,7 @@ table#all-orders td {
 			@endforeach
         </tbody>
     </table>
-	
+
 	<!-- Modal -->
 	<div class="modal fade" id="add_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	  <div class="modal-dialog">
@@ -84,13 +84,20 @@ table#all-orders td {
 		<form method="POST" action="{{ url('/admin/add_coupon') }}">
 			@csrf
 			<input type ="hidden" name="coupon_start" value="SIE-" >
-				
+
 		  	<label for="coupon_code" class="form-label">Coupon Code</label>
 			<div class="row">
 			<label class="form-label col col-1">SIE-</label>
 				<input type="text" name="coupon_code" class="form-control col col-11" id="coupon_code">
 			</div>
-    		
+    		<label for="coupon_type" class="form-label">Coupon Type</label>
+            <div class="row">
+                <select name="coupon_type" class="form-control col col-11" id="coupon_type" required>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Premium">Premium</option>
+                </select>
+            </div>
+
 
 	      </div>
 	      <div class="modal-footer">
@@ -102,9 +109,9 @@ table#all-orders td {
 	  </div>
 	</div>
 	<!-- Modal -->
-	
+
 	</div>
-	 </div>  
+	 </div>
   </div>
 
   <script>

@@ -674,15 +674,48 @@ class BookingController extends Controller
             Session::put('coupon_applied', 1);
             Session::put('coupon_code', $code);
             Session::put('coupon_type', $coupon->type);
+
+            // Return both coupon applied status and type
+            return response()->json([
+                'coupon_applied' => 1,
+                'coupon_code' => $code,
+                'coupon_type' => $coupon->type
+            ]);
+
         }
         else
         {
             Session::put('coupon_applied', 0);
             Session::put('coupon_code', null);
             Session::put('coupon_type', null);
+
+            // Return both coupon applied status and type
+            return response()->json([
+                'coupon_applied' => 0,
+                'coupon_code' => null,
+                'coupon_type' => null
+            ]);
         }
-        return Session::get('coupon_applied');
     }
+
+    // function apply_coupon(request $req)
+    // {
+    //     $code = $req->coupon_code;
+    //     $coupon = DB::table('coupons')->where('is_used', 0)->where('code', $code)->first();
+    //     if($coupon)
+    //     {
+    //         Session::put('coupon_applied', 1);
+    //         Session::put('coupon_code', $code);
+    //         Session::put('coupon_type', $coupon->type);
+    //     }
+    //     else
+    //     {
+    //         Session::put('coupon_applied', 0);
+    //         Session::put('coupon_code', null);
+    //         Session::put('coupon_type', null);
+    //     }
+    //     return Session::get('coupon_applied');
+    // }
 
     public function getCities(Request $request) {
         $stateId = DB::table('states')->where('name', $request->state)->first()->id;

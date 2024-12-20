@@ -282,6 +282,7 @@ $business_settings = DB::table('business_settings')->where('id', '1')->first();
                                                                     value="{{$slot->id}}"
                                                                     data-target="{{strtotime($date->slot_date)}}_{{md5($slot->slot_time)}}"
                                                                     data-slot="{{$slot->slot_seats}}"
+                                                                    data-type="{{$slot->type ?? 'none'}}"
                                                                     data-price="{{$slot->slot_price}}"
                                                                     id="slot_{{$slot->id}}" @if($slot->slot_seats <= 0)
                                                                     disabled @endif>
@@ -422,6 +423,8 @@ $(document).ready(function() {
     });
     $('input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
+    $('input[data-type="Premium"]:not(:disabled)').closest('.events_boxex').attr('style',
+    'background:#68c2ffc9;box-shadow: 5px 5px 0px 1px #68c2ff47;');
     price_calculation();
 });
 
@@ -430,43 +433,40 @@ $('body').on('change', 'input[name="slot_addition[]"]', function() {
     price_calculation();
 });
 
-//price calculation
-function price_calculation(selected_slot_price = 0) {
-    console.log('Selected price', selected_slot_price);
-    var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
-    var coupon_type = '{{ Session::get("coupon_type") }}';  // Get coupon type from session
+function price_calculation() {
 
-    var final_price = selected_slot_price;  // Start with the selected slot price
+    var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
+    var coupon_type = $('input[name="coupon_code"]').attr('data-type');
+    var selected_slot_type = $('input[name="slot_default"]:checked').attr('data-type');
+    var selected_price = setSlotPrice(selected_slot_type); // Initial price
 
     // If coupon is applied, adjust the price based on the coupon type
     if (coupon_code_status == 1) {
+
         // If Advanced coupon is applied and user selects Premium slot, apply ₹3000 upgrade cost
-        if (coupon_type == 'Advanced' && $('input[name="slot_default"]:checked').data('type') == 'Premium') {
-            final_price += 3000;  // ₹3000 upgrade cost
+        if (coupon_type == 'Advanced' && selected_slot_type == 'Premium') {
+            selected_price -= 2000;  // ₹3000 upgrade cost
+        }else if (coupon_type == 'Premium' && selected_slot_type == 'Advanced') {
+            selected_price = 0;  // No extra cost for Premium coupon
+        }else {
+            selected_price = 0;  // No extra cost for Premium coupon
         }
-        // If Premium coupon is applied, allow any slot type without additional charge
-        else if (coupon_type == 'Premium') {
-            final_price = 0;  // No extra cost for Premium coupon
-        }
-    }else {
-        final_price = selected_slot_price;  // Set the default price if no coupon
+
     }
 
-    console.log('Final price after coupon adjustments:', final_price);
+    // If selected_slot_price is undefined, get the price from the displayed total in .df-total
+    var slot_default_price = selected_price || 0;
 
-    // Calculate additional prices for added slots
     var slot_addition_price = 0;
     $('.slot_addition_main input:checkbox:checked').each(function() {
         slot_addition_price += parseInt($(this).attr('data-price'));
     });
-    console.log('slot_addition_price:', slot_addition_price);
 
-    // Update the displayed total price (final price is used)
-    $('.df-total').text(parseInt(final_price));
+    $('.df-total').text(parseInt(slot_default_price));
 
-    // Update grand total with final price and additional slot prices
-    $('#grand-total').html(parseInt(final_price) + parseInt(slot_addition_price));
+    $('#grand-total').html(parseInt(slot_default_price) + parseInt(slot_addition_price));
 }
+
 // function price_calculation() {
 
 //     var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
@@ -524,26 +524,12 @@ form.steps({
 
 //validate slot default
 function validate_slot_default(this_event) {
-    console.log('validate');
     var data_target = $(this_event).attr('data-target');
+    var data_type = $(this_event).attr('data-type');
     var is_checked = $(this_event).prop('checked');
-    var selected_slot_type = $(this_event).attr('data-type');  // Get the selected slot type
-    var selected_slot_price = 0;  // Initialize selected slot price
 
     // Reset all styles and disable logic
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
-
-    // Debugging: Log the selected slot type
-    console.log("Selected slot type: ", selected_slot_type);
-
-    // Set the selected slot price based on its type
-    if (selected_slot_type == 'Premium') {
-        selected_slot_price = {{$premium_price}};
-    } else if (selected_slot_type == 'Advanced') {
-        selected_slot_price = {{$advanced_price}};
-    } else {
-        selected_slot_price = {{$price}};
-    }
 
     $('input:checkbox[name="slot_addition[]"]').each(function() {
         if (parseInt($(this).attr('data-slot')) > 0) {
@@ -568,9 +554,32 @@ function validate_slot_default(this_event) {
     $(this_event).closest('.events_boxex').attr('style',
     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
 
+    $('input[data-type="Premium"]:not(:disabled):not(:checked)').closest('.events_boxex').attr('style',
+    'background:#68c2ffc9;box-shadow: 5px 5px 0px 1px #68c2ff47;');
+
     // Update total price calculation
-    price_calculation(selected_slot_price);
+    price_calculation();
 }
+
+// Common function to set slot price based on selected slot type
+function setSlotPrice(selected_slot_type) {
+
+    // Set the selected slot price based on its type
+    let selected_slot_price;
+
+    // Set the selected slot price based on its type
+    if (selected_slot_type == 'Premium') {
+        selected_slot_price = {{$premium_price}};
+    } else if (selected_slot_type == 'Advanced') {
+        selected_slot_price = {{$advanced_price}};
+    } else {
+        selected_slot_price = {{$price}};
+    }
+
+    return selected_slot_price;
+}
+
+
 // function validate_slot_default(this_event) {
 //     var data_target = $(this_event).attr('data-target');
 //     var is_checked = $(this_event).prop('checked');
@@ -625,15 +634,20 @@ function validate_slot_addition(this_event) { //created new function and deleted
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
 
+    $('.slot_addition_main input[data-type="Premium"]:disabled').closest('.events_boxex').css({
+        'background': '#0041ff61',
+        'box-shadow': '5px 5px 0px 1px #5e9feb85'
+    });
+
+
     if(is_checked){
         $(this_event).closest('.events_boxex').attr('style', 'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
     }else{
         $(this_event).closest('.events_boxex').attr('style', 'background: #b8122861;box-shadow: 5px 5px 0px 1px #a6354485;');
     }
 
-
-
-
+    // Reset all styles and disable logic
+    $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
 
     price_calculation();
 }
@@ -679,6 +693,7 @@ function finalCart() {
     var deft_topic = $(deft).attr('data-topic');
     var deft_time = $(deft).attr('data-time');
     var deft_price = $('.df-total').html();
+    console.log('final price', deft_price);
     var deft_date = $(deft).attr('data-date');
     var deft_slot = $(deft).attr('data-slot-name');
 
@@ -754,10 +769,10 @@ function finalCart() {
                 url:'{{url("apply_coupon")}}',
                 data: { _token : '<?php echo csrf_token() ?>', coupon_code : coupon_code },
                 success:function(response) {
-                    if(response == 1)
-                    {
+                    if (response.coupon_applied == 1) {
+
                         alert('Coupon applied successfully!');
-                        $('#coupon-block').html('<p class="text-success mt-2"><b>'+coupon_code+'</b> coupon applied successfully</b><input type="hidden" name="coupon_code" value="'+coupon_code+'" data-status="1"></p>');
+                        $('#coupon-block').html('<p class="text-success mt-2"><b>'+coupon_code+'</b> coupon applied successfully</b><input type="hidden" name="coupon_code" data-type="'+response.coupon_type+'" value="'+coupon_code+'" data-status="1"></p>');
                         price_calculation();
                     }
                     else
