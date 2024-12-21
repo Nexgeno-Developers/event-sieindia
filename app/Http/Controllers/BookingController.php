@@ -318,7 +318,7 @@ class BookingController extends Controller
         // Default price for the Premium type
         if ($type == 'Premium') {
 
-            $price = 5000;
+            $price = 2;
 
             // Set price for Premium type
             // if (strtotime(date('Y-m-d H:i:s')) >= strtotime('2024-12-19 00:00:00')) {
@@ -331,7 +331,7 @@ class BookingController extends Controller
         // Default price for the Advanced type
         elseif ($type == 'Advanced') {
 
-            $price = 2000;
+            $price = 1;
 
             // Set price for Advanced type
             // if (strtotime(date('Y-m-d H:i:s')) >= strtotime('2023-08-03 00:00:00')) {

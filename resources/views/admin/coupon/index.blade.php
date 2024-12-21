@@ -36,6 +36,7 @@ table#all-orders td {
             <tr>
 				<th>SR No</th>
 				<th>Coupons Code</th>
+				<th>Type</th>
 				<th>Is Used</th>
 				<!--<th>Date</th>-->
                 <!--<th>Action</th>-->
@@ -51,6 +52,9 @@ table#all-orders td {
 				<td>{{$x++}}</td>
 				<td>
 					{{$data->code}}
+				</td>
+				<td>
+					{{$data->type}}
 				</td>
 				<td>
 					@if($data->is_used == 1)

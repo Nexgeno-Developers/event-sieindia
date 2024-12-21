@@ -29,9 +29,9 @@ $price = $price;
 $business_settings = DB::table('business_settings')->where('id', '1')->first();
 
 
-$check = $total_order + $business_settings->checkbox;  
+$check = $total_order + $business_settings->checkbox;
 
-if($check <= $business_settings->number_of_order){ 
+if($check <= $business_settings->number_of_order){
     $business_set = $business_settings->checkbox;
 } else {
     $business_set = $business_settings->number_of_order - $total_order;
@@ -133,16 +133,16 @@ if($check <= $business_settings->number_of_order){
                                             </select>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-3 col-md-3 col-6 paddright6">
                                         <div class="form-group">
                                             <input type="text" name="zipcode" class="form-control"
                                                 placeholder="Enter Zipcode*" value="{{$zipcode}}" minlength="3" maxlength="50"
                                                 required readonly>
                                         </div>
-                                    </div>                                    
-                                    
-                                    
+                                    </div>
+
+
                                     <div class="col-lg-3 col-md-3 col-6 paddleft6">
                                         <div class="form-group">
                                             <input type="text" name="dci_no" class="form-control"
@@ -276,17 +276,17 @@ if($check <= $business_settings->number_of_order){
                                                 <div
                                                     @php
                                                     $purchased = 'no'; // Initialize the $purchased variable outside the loop
-                                                    
+
                                                     foreach ($orders as $order) {
                                                         $order_items = DB::table('order_items')->where('order_id', $order->id)->get();
-                                                        
+
                                                         foreach ($order_items as $items) {
                                                             if ($items->slot_id == $slot->id) {
                                                                 $purchased = 'yes';
                                                                 break; // Break out of the loop once the slot is found in any order
                                                             }
                                                         }
-                                                    
+
                                                         if ($purchased === 'yes') {
                                                             // If the slot is found in any order, no need to continue checking other orders
                                                             break;
@@ -303,6 +303,7 @@ if($check <= $business_settings->number_of_order){
                                                                     value="{{$slot->id}}"
                                                                     data-target="{{strtotime($date->slot_date)}}_{{md5($slot->slot_time)}}"
                                                                     data-slot="{{$slot->slot_seats}}"
+                                                                    data-type="{{$slot->type ?? 'none'}}"
                                                                     data-price="{{$slot->slot_price}}"
                                                                     id="slot_{{$slot->id}}" @if($slot->slot_seats <= 0)
                                                                     disabled @endif @if($purchased === 'yes') disabled @endif
@@ -311,7 +312,7 @@ if($check <= $business_settings->number_of_order){
 
                                                             <div class="col-md-10 col-11 paddleft0">
                                                                 <label class="" for="slot_{{$slot->id}}"
-                                                                    @if($slot->slot_seats <= 0) disabled @endif 
+                                                                    @if($slot->slot_seats <= 0) disabled @endif
                                                                     @if($purchased === 'yes') disabled @endif>
 																	<p class="speakers_cle"> <b>Workshop:</b>
                                                                                     {{$slot->workshop}}
@@ -446,6 +447,21 @@ $(document).ready(function() {
     $('input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
     price_calculation();
+
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
+
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
+
 });
 
 //change slot addition field
@@ -455,7 +471,7 @@ $('body').on('change', 'input[name="slot_addition[]"]', function() {
 
 //price calculation
 function price_calculation() {
-     
+
     var coupon_code_status = $('input[name="coupon_code"]').attr('data-status');
 
     var slot_default_price = (coupon_code_status == 1) ? 0 : '{{$price}}';
@@ -516,6 +532,8 @@ function validate_slot_default(this_event) {
 
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
 
+    $('.slot_addition_main .events_boxex').attr('style', '');
+
     $('input:checkbox[name="slot_addition[]"]').each(function() {
         if (parseInt($(this).attr('data-slot')) > 0) {
             if ($(this).attr('data-target') == data_target) {
@@ -534,10 +552,26 @@ function validate_slot_default(this_event) {
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
 
     $('.slot_addition_default .events_boxex').attr('style', '');
+
     $('.slot_addition_default input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
+
     $(this_event).closest('.events_boxex').attr('style',
     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
+
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
+
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
 
     price_calculation();
 }
@@ -556,26 +590,53 @@ function validate_slot_default(this_event) {
     price_calculation();
 }*/
 
-function validate_slot_addition(this_event) { //created new function and deleted old by rashid
-    var data_target = $(this_event).attr('data-target');
+function validate_slot_addition(this_event) {
     var is_checked = $(this_event).prop('checked');
-    
-    //$('.slot_addition_main .events_boxex').attr('style', '');
+    var data_type = $(this_event).attr('data-type'); // Get the data-type
+
+
+    // Apply styles for disabled inputs
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
-    
-    if(is_checked){
-        $(this_event).closest('.events_boxex').attr('style', 'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
+
+    // Handle 'premium' case
+    if (data_type === 'Premium') {
+        if (!is_checked) {
+            // If unchecked and premium
+            $(this_event).closest('.events_boxex').attr('style',
+                'background: #859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        } else {
+            // If checked, apply default checked style for premium
+            $(this_event).closest('.events_boxex').attr('style',
+                'background: #4caf5087; box-shadow: 5px 5px 0px 1px #4caf50b5;');
+        }
     }else{
-        $(this_event).closest('.events_boxex').attr('style', 'background: #b8122861;box-shadow: 5px 5px 0px 1px #a6354485;');
+        // Default behavior for non-premium inputs
+        var defaultStyle = is_checked
+        ? 'background: #4caf5087; box-shadow: 5px 5px 0px 1px #4caf50b5;' // Checked state
+        : 'background: #b8122861; box-shadow: 5px 5px 0px 1px #a6354485;'; // Unchecked state
+
+        $(this_event).closest('.events_boxex').attr('style', defaultStyle);
     }
 
-    
-    
-    
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
 
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
+
+    // Call the price calculation function
     price_calculation();
 }
+
 
 //button fixed in mobile
 $(document).ready(function() {
@@ -612,7 +673,7 @@ $('body').on('click', '.topic_desc', function() {
 });
 
 function finalCart() {
-    
+
     var deft = $('.slot_addition_default input[name="slot_default"]:checked').attr('id');
     var deft = $('.slot_addition_default label[for="' + deft + '"]').find('.topic_desc');
     var deft_speaker = $(deft).attr('data-speaker');
@@ -621,7 +682,7 @@ function finalCart() {
     var deft_price = $('.df-total').html();
     var deft_date = $(deft).attr('data-date');
     var deft_slot = $(deft).attr('data-slot-name');
-    
+
 
     var addtt = $('.slot_addition_main input[name="slot_addition[]"]:checked').attr('id');
 
@@ -663,7 +724,7 @@ function finalCart() {
 
     //var pr = parseInt(deft_price) + parseInt(addit_total_price);
     var pr =  parseInt(addit_total_price);
-    
+
     /*var html2 = '';
     console.log(addtt);
     if(addtt != undefined)
@@ -695,10 +756,10 @@ function finalCart() {
                 url:'{{url("apply_coupon")}}',
                 data: { _token : '<?php echo csrf_token() ?>', coupon_code : coupon_code },
                 success:function(response) {
-                    if(response == 1)
-                    {
+                    if (response.coupon_applied == 1) {
+
                         alert('Coupon applied successfully!');
-                        $('#coupon-block').html('<p class="text-success mt-2"><b>'+coupon_code+'</b> coupon applied successfully</b><input type="hidden" name="coupon_code" value="'+coupon_code+'" data-status="1"></p>');
+                        $('#coupon-block').html('<p class="text-success mt-2"><b>'+coupon_code+'</b> coupon applied successfully</b><input type="hidden" name="coupon_code" data-type="'+response.coupon_type+'" value="'+coupon_code+'" data-status="1"></p>');
                         price_calculation();
                     }
                     else
@@ -706,7 +767,7 @@ function finalCart() {
                         alert('Invalid coupon!');
                     }
                 }
-            });            
+            });
         }
     }
 </script>

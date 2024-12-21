@@ -423,8 +423,22 @@ $(document).ready(function() {
     });
     $('input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
-    $('input[data-type="Premium"]:not(:disabled)').closest('.events_boxex').attr('style',
-    'background:#68c2ffc9;box-shadow: 5px 5px 0px 1px #68c2ff47;');
+
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
+
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
+
+
     price_calculation();
 });
 
@@ -445,7 +459,7 @@ function price_calculation() {
 
         // If Advanced coupon is applied and user selects Premium slot, apply ₹3000 upgrade cost
         if (coupon_type == 'Advanced' && selected_slot_type == 'Premium') {
-            selected_price -= 2000;  // ₹3000 upgrade cost
+            selected_price -= 1;  // ₹2000 upgrade cost
         }else if (coupon_type == 'Premium' && selected_slot_type == 'Advanced') {
             selected_price = 0;  // No extra cost for Premium coupon
         }else {
@@ -525,11 +539,11 @@ form.steps({
 //validate slot default
 function validate_slot_default(this_event) {
     var data_target = $(this_event).attr('data-target');
-    var data_type = $(this_event).attr('data-type');
     var is_checked = $(this_event).prop('checked');
 
-    // Reset all styles and disable logic
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
+
+    $('.slot_addition_main .events_boxex').attr('style', '');
 
     $('input:checkbox[name="slot_addition[]"]').each(function() {
         if (parseInt($(this).attr('data-slot')) > 0) {
@@ -549,15 +563,27 @@ function validate_slot_default(this_event) {
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
 
     $('.slot_addition_default .events_boxex').attr('style', '');
+
     $('.slot_addition_default input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
+
     $(this_event).closest('.events_boxex').attr('style',
     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
 
-    $('input[data-type="Premium"]:not(:disabled):not(:checked)').closest('.events_boxex').attr('style',
-    'background:#68c2ffc9;box-shadow: 5px 5px 0px 1px #68c2ff47;');
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
 
-    // Update total price calculation
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
+
     price_calculation();
 }
 
@@ -580,38 +606,6 @@ function setSlotPrice(selected_slot_type) {
 }
 
 
-// function validate_slot_default(this_event) {
-//     var data_target = $(this_event).attr('data-target');
-//     var is_checked = $(this_event).prop('checked');
-
-//     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
-
-//     $('input:checkbox[name="slot_addition[]"]').each(function() {
-//         if (parseInt($(this).attr('data-slot')) > 0) {
-//             if ($(this).attr('data-target') == data_target) {
-//                 $(this).attr('disabled', 'disabled');
-//                 $(this).prop('checked', false);
-//             } else {
-//                 $(this).removeAttr('disabled');
-//                 $(this).prop('checked', false);
-//             }
-//         }
-//     });
-
-//     $('.slot_addition_main input[data-slot="0"]').attr("disabled", 'disabled');
-
-//     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
-//         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
-
-//     $('.slot_addition_default .events_boxex').attr('style', '');
-//     $('.slot_addition_default input[disabled]').closest('.events_boxex').attr('style',
-//         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
-//     $(this_event).closest('.events_boxex').attr('style',
-//     'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
-
-//     price_calculation();
-// }
-
 //validate slot addition
 /*function validate_slot_addition(this_event) {
     var data_target = $(this_event).attr('data-target');
@@ -626,31 +620,54 @@ function setSlotPrice(selected_slot_type) {
     price_calculation();
 }*/
 
-function validate_slot_addition(this_event) { //created new function and deleted old by rashid
-    var data_target = $(this_event).attr('data-target');
+function validate_slot_addition(this_event) {
     var is_checked = $(this_event).prop('checked');
+    var data_type = $(this_event).attr('data-type'); // Get the data-type
 
-    //$('.slot_addition_main .events_boxex').attr('style', '');
+
+    // Apply styles for disabled inputs
     $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style',
         'background:rgb(255 0 0 / 15%);pointer-events: none;box-shadow: 5px 5px 0px 1px #b8122847;');
 
-    $('.slot_addition_main input[data-type="Premium"]:disabled').closest('.events_boxex').css({
-        'background': '#0041ff61',
-        'box-shadow': '5px 5px 0px 1px #5e9feb85'
-    });
-
-
-    if(is_checked){
-        $(this_event).closest('.events_boxex').attr('style', 'background: #4caf5087;box-shadow: 5px 5px 0px 1px #4caf50b5;');
+    // Handle 'premium' case
+    if (data_type === 'Premium') {
+        if (!is_checked) {
+            // If unchecked and premium
+            $(this_event).closest('.events_boxex').attr('style',
+                'background: #859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        } else {
+            // If checked, apply default checked style for premium
+            $(this_event).closest('.events_boxex').attr('style',
+                'background: #4caf5087; box-shadow: 5px 5px 0px 1px #4caf50b5;');
+        }
     }else{
-        $(this_event).closest('.events_boxex').attr('style', 'background: #b8122861;box-shadow: 5px 5px 0px 1px #a6354485;');
+        // Default behavior for non-premium inputs
+        var defaultStyle = is_checked
+        ? 'background: #4caf5087; box-shadow: 5px 5px 0px 1px #4caf50b5;' // Checked state
+        : 'background: #b8122861; box-shadow: 5px 5px 0px 1px #a6354485;'; // Unchecked state
+
+        $(this_event).closest('.events_boxex').attr('style', defaultStyle);
     }
 
-    // Reset all styles and disable logic
-    $('.slot_addition_main input[disabled]').closest('.events_boxex').attr('style', '');
+    $('input[data-type="Premium"]').each(function() {
+        var $input = $(this);
+        var $eventsBox = $input.closest('.events_boxex');
 
+        // Check if the input is disabled and not checked
+        if ($input.is(':disabled')) {
+            // Disabled style
+            $eventsBox.attr('style', 'background:#a8b6e8; box-shadow: 5px 5px 0px 1px #7191fe;');
+        } else if (!$input.is(':checked')) {
+            // Enabled and unchecked style
+            $eventsBox.attr('style', 'background:#859bed; box-shadow: 5px 5px 0px 1px #3054c0;');
+        }
+    });
+
+    // Call the price calculation function
     price_calculation();
 }
+
+
 
 //button fixed in mobile
 $(document).ready(function() {
